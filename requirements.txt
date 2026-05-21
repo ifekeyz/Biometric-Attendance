@@ -1,0 +1,7 @@
+# Biometric Facial Recognition System — Python Dependencies
+# Install with:  pip install -r requirements.txt
+
+opencv-python>=4.7.0
+opencv-contrib-python>=4.7.0   # required for cv2.face.LBPHFaceRecognizer
+numpy>=1.23.0
+Pillow>=9.0.0                  # optional – needed for Tkinter GUI image display

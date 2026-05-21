@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biometric Facial Recognition System</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #000; color: #fff; font-family: 'Poppins', monospace; font-size: 14px; min-height: 100vh; }
+header { background: #000; border-bottom: 1px solid #fff; padding: 0 28px; height: 52px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.site-title { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: #fff; }
+.hstats { display: flex; gap: 24px; font-size: 11px; color: #888; letter-spacing: 1px; }
+.hstats b { color: #fff; }
+nav { background: #000; border-bottom: 1px solid #333; display: flex; padding: 0 28px; }
+.tab { padding: 12px 20px; font-family: 'Share Tech Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #555; cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; transition: all .15s; }
+.tab:hover { color: #ccc; } .tab.active { color: #fff; border-bottom-color: #fff; }
+main { padding: 24px 28px; max-width: 1300px; margin: 0 auto; }
+.page { display: none; } .page.active { display: block; animation: fi .2s ease; }
+@keyframes fi { from { opacity: 0; } to { opacity: 1; } }
+.sec-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #fff; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #333; }
+.stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+.scard { background: #000; border: 1px solid #333; padding: 16px 18px; }
+.slabel { font-size: 9px; letter-spacing: 2px; color: #666; margin-bottom: 8px; }
+.sval { font-size: 36px; color: #fff; line-height: 1; }
+.fbar { display: flex; gap: 6px; margin-bottom: 14px; }
+.fbtn { padding: 5px 14px; font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 1px; background: #000; border: 1px solid #444; color: #666; cursor: pointer; transition: all .1s; }
+.fbtn:hover { border-color: #fff; color: #fff; } .fbtn.active { background: #fff; border-color: #fff; color: #000; }
+.twrap { border: 1px solid #333; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+thead th { background: #111; font-size: 9px; letter-spacing: 2px; color: #666; text-align: left; padding: 10px 14px; border-bottom: 1px solid #333; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid #1a1a1a; cursor: pointer; transition: background .1s; }
+tbody tr:hover { background: #111; } tbody tr.sel { background: #1a1a1a; }
+tbody td { padding: 10px 14px; white-space: nowrap; }
+.badge { display: inline-block; padding: 2px 8px; font-size: 10px; letter-spacing: 1px; border: 1px solid; }
+.be { color: #fff; border-color: #fff; } .bc { color: #666; border-color: #444; }
+.bm { color: #fff; border-color: #fff; } .bn { color: #555; border-color: #333; }
+.dash-grid { display: grid; grid-template-columns: 1fr 260px; gap: 16px; margin-top: 16px; }
+.preview-panel { border: 1px solid #333; padding: 16px; background: #000; }
+.face-box { width: 180px; height: 180px; margin: 0 auto 14px; border: 1px solid #333; display: flex; align-items: center; justify-content: center; background: #0a0a0a; overflow: hidden; font-size: 10px; color: #555; text-align: center; }
+.face-box img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); }
+.irow { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1a1a1a; font-size: 12px; }
+.irow:last-child { border: none; } .ik { color: #555; font-size: 10px; } .iv { color: #fff; }
+.fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fg { display: flex; flex-direction: column; gap: 5px; }
+label { font-size: 9px; letter-spacing: 2px; color: #666; }
+input, select { background: #000; border: 1px solid #444; color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 12px; padding: 9px 12px; outline: none; transition: border .15s; width: 100%; }
+input:focus, select:focus { border-color: #fff; } select option { background: #000; }
+input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 9px 18px; font-family: 'Share Tech Mono', monospace; font-size: 11px; letter-spacing: 2px; border: 1px solid; cursor: pointer; transition: all .1s; white-space: nowrap; }
+.btn:disabled { opacity: .3; cursor: not-allowed; }
+.btn-p { background: #fff; color: #000; border-color: #fff; } .btn-p:hover:not(:disabled) { background: #ddd; }
+.btn-s { background: #000; color: #fff; border-color: #fff; } .btn-s:hover:not(:disabled) { background: #111; }
+.btn-d { background: #000; color: #888; border-color: #444; } .btn-d:hover:not(:disabled) { border-color: #fff; color: #fff; }
+.cam-wrap { position: relative; width: 100%; max-width: 480px; aspect-ratio: 4/3; background: #000; border: 1px solid #333; margin: 0 auto; overflow: hidden; }
+.cam-wrap video, .cam-wrap img.cam-feed { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.corner { position: absolute; width: 18px; height: 18px; border-color: #fff; border-style: solid; z-index: 2; pointer-events: none; }
+.ctL { top:8px;left:8px;border-width:2px 0 0 2px; } .ctR { top:8px;right:8px;border-width:2px 2px 0 0; }
+.cbL { bottom:8px;left:8px;border-width:0 0 2px 2px; } .cbR { bottom:8px;right:8px;border-width:0 2px 2px 0; }
+.cam-status { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,.88); padding: 14px 12px 8px; font-size: 10px; letter-spacing: 2px; color: #fff; text-align: center; z-index: 2; border-top: 1px solid #222; }
+.prog-wrap { margin: 12px 0; }
+.prog-label { font-size: 10px; color: #666; display: flex; justify-content: space-between; margin-bottom: 5px; }
+.prog-bar { height: 2px; background: #222; } .prog-fill { height: 100%; background: #fff; transition: width .3s; }
+.enroll-layout { display: grid; grid-template-columns: 1fr 480px; gap: 20px; }
+.rec-layout { display: grid; grid-template-columns: 480px 1fr; gap: 20px; }
+.result-area { border: 1px solid #333; padding: 20px; display: flex; flex-direction: column; gap: 14px; min-height: 440px; background: #000; }
+.result-badge { font-size: 14px; letter-spacing: 3px; padding: 12px 20px; text-align: center; width: 100%; border: 1px solid; }
+.r-idle { color: #444; border-color: #222; } .r-match { color: #fff; border-color: #fff; background: #111; }
+.r-nomatch { color: #555; border-color: #333; } .r-noface { color: #888; border-color: #444; }
+.conf-row { font-size: 10px; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
+.conf-bar { height: 2px; background: #222; } .conf-fill { height: 100%; background: #fff; transition: width .4s; }
+.err-box { border: 1px solid #555; padding: 9px 12px; font-size: 11px; color: #ccc; display: none; background: #0a0a0a; }
+.err-box.show { display: block; }
+.ok-box  { border: 1px solid #fff; padding: 9px 12px; font-size: 11px; color: #fff; display: none; background: #0a0a0a; }
+.ok-box.show  { display: block; }
+#toast { position: fixed; bottom: 24px; right: 24px; padding: 10px 18px; background: #000; border: 1px solid #fff; font-size: 11px; letter-spacing: 1px; color: #fff; z-index: 9998; transform: translateY(60px); opacity: 0; transition: all .25s; }
+#toast.show { transform: none; opacity: 1; } #toast.err { border-color: #555; color: #999; } #toast.warn { border-color: #888; }
+.spin { display: inline-block; width: 12px; height: 12px; border: 1px solid #444; border-top-color: #fff; border-radius: 50%; animation: sp .7s linear infinite; }
+@keyframes sp { to { transform: rotate(360deg); } }
+tr.lm td { color: #fff; } tr.ln td { color: #555; }
+.scan-row { display: flex; justify-content: space-between; font-size: 10px; padding: 5px 8px; border-left: 2px solid #fff; background: #080808; letter-spacing: 1px; }
+.scan-row.no { border-left-color: #333; color: #555; }
+@media(max-width:900px) { .stats-row,.dash-grid,.enroll-layout,.rec-layout,.fgrid { grid-template-columns: 1fr; } main { padding: 14px; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="site-title">BIOMETRIC FACIAL RECOGNITION SYSTEM</div>
+  <div class="hstats">
+    <span>ENROLLED <b id="hE">—</b></span>
+    <span>CONTROL <b id="hC">—</b></span>
+    <span>SAMPLES <b id="hS">—</b></span>
+  </div>
+</header>
+
+<nav>
+  <button class="tab active" onclick="showPage('dashboard',this)">Dashboard</button>
+  <button class="tab" onclick="showPage('enroll',this)">Enroll</button>
+  <button class="tab" onclick="showPage('recognize',this)">Recognize</button>
+  <button class="tab" onclick="showPage('log',this)">Audit Log</button>
+</nav>
+
+<main>
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page active">
+  <div class="stats-row">
+    <div class="scard"><div class="slabel">TOTAL PERSONS</div><div class="sval" id="sT">—</div></div>
+    <div class="scard"><div class="slabel">ENROLLED</div>     <div class="sval" id="sE">—</div></div>
+    <div class="scard"><div class="slabel">CONTROL GROUP</div><div class="sval" id="sC">—</div></div>
+    <div class="scard"><div class="slabel">FACE SAMPLES</div> <div class="sval" id="sSamp">—</div></div>
+  </div>
+  <div class="fbar">
+    <button class="fbtn active" onclick="loadPersons('all',this)">ALL</button>
+    <button class="fbtn" onclick="loadPersons('enrolled',this)">ENROLLED</button>
+    <button class="fbtn" onclick="loadPersons('control',this)">CONTROL</button>
+  </div>
+  <div class="dash-grid">
+    <div>
+      <div class="twrap">
+        <table><thead><tr>
+          <th>ID</th><th>NAME</th><th>AGE</th><th>SEX</th><th>DATE OF BIRTH</th><th>STATUS</th><th>SAMPLES</th>
+        </tr></thead><tbody id="personsTbody"></tbody></table>
+      </div>
+      <p style="font-size:10px;color:#444;padding:8px 0;letter-spacing:1px">CLICK A ROW TO PREVIEW</p>
+    </div>
+    <div class="preview-panel">
+      <div class="sec-title">PERSON PREVIEW</div>
+      <div class="face-box" id="prevFace">SELECT A ROW</div>
+      <div id="prevInfo"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ENROLL -->
+<div id="page-enroll" class="page">
+  <div class="enroll-layout">
+    <div style="border:1px solid #333;padding:22px">
+      <div class="sec-title">STEP 1 — ENTER DETAILS</div>
+      <div class="fgrid">
+        <div class="fg" style="grid-column:1/-1">
+          <label>FULL NAME</label>
+          <input type="text" id="eName" placeholder="Enter full name">
+        </div>
+        <div class="fg">
+          <label>AGE</label>
+          <input type="number" id="eAge" placeholder="e.g. 28" min="1" max="120">
+        </div>
+        <div class="fg">
+          <label>SEX</label>
+          <select id="eSex">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="fg" style="grid-column:1/-1">
+          <label>DATE OF BIRTH</label>
+          <input type="date" id="eDob">
+        </div>
+      </div>
+      <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-p" id="startEnrollBtn" onclick="startEnroll()">▶ START WEBCAM CAPTURE</button>
+        <button class="btn btn-d" id="cancelEnrollBtn" onclick="cancelEnroll()" style="display:none">✕ CANCEL</button>
+      </div>
+      <div class="prog-wrap" id="progWrap" style="display:none">
+        <div class="prog-label"><span>FACE SAMPLES CAPTURED</span><span id="progText">0 / 5</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="err-box" id="enrollErr"></div>
+        <div class="ok-box"  id="enrollOk"></div>
+      </div>
+    </div>
+    <div style="border:1px solid #333;padding:22px;display:flex;flex-direction:column;gap:14px;align-items:center">
+      <div class="sec-title" style="width:100%">STEP 2 — FACE CAPTURE</div>
+      <div class="cam-wrap">
+        <video id="enrollVideo" autoplay playsinline muted style="display:block"></video>
+        <img   id="enrollFeed" class="cam-feed" style="display:none" alt="">
+        <div class="corner ctL"></div><div class="corner ctR"></div>
+        <div class="corner cbL"></div><div class="corner cbR"></div>
+        <div class="cam-status" id="enrollStatus">WAITING — FILL DETAILS FIRST</div>
+      </div>
+      <p style="font-size:10px;color:#555;text-align:center;line-height:1.8;letter-spacing:1px">
+        FILL IN DETAILS THEN CLICK START.<br>
+        LOOK DIRECTLY AT CAMERA.<br>
+        5 SAMPLES CAPTURED AUTOMATICALLY.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- RECOGNIZE -->
+<div id="page-recognize" class="page">
+  <div class="rec-layout">
+    <div style="border:1px solid #333;padding:22px;display:flex;flex-direction:column;gap:14px;align-items:center">
+      <div class="sec-title" style="width:100%">LIVE WEBCAM FEED</div>
+      <div class="cam-wrap">
+        <video id="recVideo" autoplay playsinline muted style="display:block"></video>
+        <img   id="recFeed" class="cam-feed" style="display:none" alt="">
+        <div class="corner ctL"></div><div class="corner ctR"></div>
+        <div class="corner cbL"></div><div class="corner cbR"></div>
+        <div class="cam-status" id="recStatus">PRESS START TO BEGIN</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-p" id="startRecBtn" onclick="startRecognize()">▶ START</button>
+        <button class="btn btn-d" id="stopRecBtn" onclick="stopRecognize()" style="display:none">■ STOP</button>
+      </div>
+    </div>
+    <div class="result-area">
+      <div class="sec-title">SCAN RESULT</div>
+      <div class="result-badge r-idle" id="recBadge">── AWAITING SCAN ──</div>
+      <div id="confSection" style="display:none">
+        <div class="conf-row"><span>CONFIDENCE DISTANCE</span><span id="confVal">—</span></div>
+        <div class="conf-bar"><div class="conf-fill" id="confFill" style="width:0"></div></div>
+        <div style="font-size:9px;color:#555;margin-top:4px;letter-spacing:1px">THRESHOLD: &lt; 75 = MATCH | LOWER = BETTER</div>
+      </div>
+      <div id="recDetails"></div>
+      <div style="margin-top:auto;padding-top:12px;border-top:1px solid #1a1a1a">
+        <div style="font-size:9px;color:#555;margin-bottom:8px;letter-spacing:2px">RECENT SCANS</div>
+        <div id="recentScans" style="display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUDIT LOG -->
+<div id="page-log" class="page">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div class="sec-title" style="margin:0;border:none">RECOGNITION AUDIT LOG</div>
+    <button class="btn btn-s" onclick="loadLog()" style="font-size:10px;padding:6px 14px">REFRESH</button>
+  </div>
+  <div class="twrap">
+    <table><thead><tr>
+      <th>TIMESTAMP</th><th>PERSON</th><th>CONFIDENCE</th><th>RESULT</th>
+    </tr></thead><tbody id="logTbody"></tbody></table>
+  </div>
+  <p style="font-size:10px;color:#444;padding:8px 0;letter-spacing:1px" id="logCount"></p>
+</div>
+
+</main>
+<div id="toast"></div>
+<canvas id="snap" style="display:none"></canvas>
+
+<script>
+const API='http://localhost:8787';
+let enrollStream=null,enrollTimer=null,enrollPid=null;
+let recStream=null,recTimer=null,recRunning=false;
+
+let toastT;
+function toast(msg,type='ok'){const el=document.getElementById('toast');el.textContent=msg;el.className='show '+type;clearTimeout(toastT);toastT=setTimeout(()=>el.className='',3500);}
+function showErr(id,msg){const el=document.getElementById(id);el.textContent='✗ '+msg;el.className='err-box show';}
+function showOk(id,msg){const el=document.getElementById(id);el.textContent='✓ '+msg;el.className='ok-box show';}
+function clearMsg(id){document.getElementById(id).className=id.includes('Err')?'err-box':'ok-box';}
+
+async function api(url,opts){
+  try{
+    const res=await fetch(url,opts);
+    const text=await res.text();
+    if(!text.trim())return{error:'Empty response — make sure server.py is running'};
+    try{return JSON.parse(text);}catch{return{error:'Bad response: '+text.slice(0,80)};}
+  }catch(e){return{error:'Cannot reach server — run: python3 server.py'};}
+}
+
+function showPage(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name!=='enroll')    stopEnrollStream();
+  if(name!=='recognize') stopRecognize();
+  if(name==='dashboard'){loadStats();loadPersons('all');}
+  if(name==='log')       loadLog();
+}
+
+async function loadStats(){
+  const r=await api(API+'/api/stats');
+  if(r.error)return;
+  document.getElementById('sT').textContent=r.total;
+  document.getElementById('sE').textContent=r.enrolled;
+  document.getElementById('sC').textContent=r.control;
+  document.getElementById('sSamp').textContent=r.samples;
+  document.getElementById('hE').textContent=r.enrolled;
+  document.getElementById('hC').textContent=r.control;
+  document.getElementById('hS').textContent=r.samples;
+}
+
+async function loadPersons(mode,btn){
+  if(btn){document.querySelectorAll('.fbar .fbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+  const persons=await api(API+'/api/persons?mode='+mode);
+  if(!Array.isArray(persons))return;
+  const tb=document.getElementById('personsTbody');
+  tb.innerHTML='';
+  persons.forEach(p=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="color:#888">${p.id}</td><td><strong>${p.name}</strong></td><td style="color:#888">${p.age}</td><td style="color:#888">${p.sex}</td><td style="color:#888">${p.dob}</td><td><span class="badge ${p.enrolled?'be':'bc'}">${p.enrolled?'ENROLLED':'CONTROL'}</span></td><td style="color:#888">${p.samples}</td>`;
+    tr.onclick=()=>selectPerson(p,tr);
+    tb.appendChild(tr);
+  });
+}
+
+async function selectPerson(p,tr){
+  document.querySelectorAll('#personsTbody tr').forEach(r=>r.classList.remove('sel'));
+  tr.classList.add('sel');
+  const fb=document.getElementById('prevFace');
+  fb.textContent='LOADING…';
+  const r=await api(API+'/api/face?id='+p.id);
+  if(r&&r.img)fb.innerHTML=`<img src="${r.img}" alt="face">`;
+  else fb.textContent=p.enrolled?'NO FACE STORED':'CONTROL';
+  document.getElementById('prevInfo').innerHTML=`
+    <div class="irow"><span class="ik">ID</span>     <span class="iv">${p.id}</span></div>
+    <div class="irow"><span class="ik">NAME</span>   <span class="iv">${p.name}</span></div>
+    <div class="irow"><span class="ik">AGE</span>    <span class="iv">${p.age}</span></div>
+    <div class="irow"><span class="ik">SEX</span>    <span class="iv">${p.sex}</span></div>
+    <div class="irow"><span class="ik">DOB</span>    <span class="iv">${p.dob}</span></div>
+    <div class="irow"><span class="ik">STATUS</span> <span class="iv">${p.enrolled?'ENROLLED':'CONTROL'}</span></div>
+    <div class="irow"><span class="ik">SAMPLES</span><span class="iv">${p.samples}</span></div>`;
+}
+
+async function startCam(videoEl){
+  const stream=await navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:'user'},audio:false});
+  videoEl.srcObject=stream;
+  await new Promise(res=>{videoEl.onloadedmetadata=res;});
+  return stream;
+}
+
+function grabFrame(videoEl){
+  const c=document.getElementById('snap');
+  c.width=Math.min(videoEl.videoWidth,640);
+  c.height=Math.min(videoEl.videoHeight,480);
+  c.getContext('2d').drawImage(videoEl,0,0,c.width,c.height);
+  return c.toDataURL('image/jpeg',0.92);
+}
+
+async function startEnroll(){
+  const name=document.getElementById('eName').value.trim();
+  const age=document.getElementById('eAge').value.trim();
+  const sex=document.getElementById('eSex').value;
+  const dobRaw=document.getElementById('eDob').value;
+  clearMsg('enrollErr');clearMsg('enrollOk');
+  if(!name){showErr('enrollErr','Full name is required.');return;}
+  if(!age){showErr('enrollErr','Age is required.');return;}
+  if(!dobRaw){showErr('enrollErr','Date of birth is required.');return;}
+
+  document.getElementById('enrollStatus').textContent='STARTING CAMERA…';
+  try{
+    enrollStream=await startCam(document.getElementById('enrollVideo'));
+  }catch(e){
+    let msg='Camera error: '+e.message;
+    if(e.name==='NotAllowedError')  msg='Camera blocked — click camera icon in address bar → Allow → reload page.';
+    if(e.name==='NotFoundError')    msg='No camera found on this device.';
+    if(e.name==='NotReadableError') msg='Camera in use by another app. Close it and retry.';
+    showErr('enrollErr',msg);
+    document.getElementById('enrollStatus').textContent='CAMERA ERROR';
+    return;
+  }
+
+  document.getElementById('enrollVideo').style.display='block';
+  document.getElementById('enrollFeed').style.display='none';
+  document.getElementById('startEnrollBtn').style.display='none';
+  document.getElementById('cancelEnrollBtn').style.display='inline-flex';
+  document.getElementById('enrollStatus').textContent='REGISTERING…';
+
+  const res=await api(API+'/api/enroll/start',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name,age:parseInt(age),sex,dob:dobRaw})
+  });
+  if(res.error){
+    showErr('enrollErr',res.error);
+    stopEnrollStream();
+    document.getElementById('startEnrollBtn').style.display='inline-flex';
+    document.getElementById('cancelEnrollBtn').style.display='none';
+    document.getElementById('enrollStatus').textContent='ERROR — RESTART SERVER';
+    return;
+  }
+  enrollPid=res.pid;
+  document.getElementById('progWrap').style.display='block';
+  document.getElementById('enrollStatus').textContent='LOOK AT CAMERA — CAPTURING…';
+  updateProg(0,res.needed);
+  enrollTimer=setInterval(()=>sendEnrollFrame(res.needed),900);
+}
+
+async function sendEnrollFrame(needed){
+  const video=document.getElementById('enrollVideo');
+  if(!video.videoWidth)return;
+  const res=await api(API+'/api/enroll/frame',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({frame:grabFrame(video)})});
+  if(res.error)return;
+  if(res.preview){const f=document.getElementById('enrollFeed');f.src=res.preview;f.style.display='block';}
+  if(res.status==='no_face'){document.getElementById('enrollStatus').textContent='NO FACE — MOVE CLOSER / FACE CAMERA';return;}
+  updateProg(res.collected,needed);
+  document.getElementById('enrollStatus').textContent='CAPTURED '+res.collected+' OF '+needed;
+  if(res.status==='complete'){
+    clearInterval(enrollTimer);enrollTimer=null;
+    stopEnrollStream();
+    if(res.face_img){const f=document.getElementById('enrollFeed');f.src=res.face_img;f.style.display='block';document.getElementById('enrollVideo').style.display='none';}
+    document.getElementById('enrollStatus').textContent='ENROLLMENT COMPLETE';
+    document.getElementById('startEnrollBtn').style.display='inline-flex';
+    document.getElementById('cancelEnrollBtn').style.display='none';
+    showOk('enrollOk',document.getElementById('eName').value.trim()+' enrolled (ID: '+enrollPid+')');
+    toast('ENROLLMENT COMPLETE');
+    loadStats();
+  }
+}
+
+function updateProg(n,total){document.getElementById('progFill').style.width=Math.round(n/total*100)+'%';document.getElementById('progText').textContent=n+' / '+total;}
+
+async function cancelEnroll(){
+  clearInterval(enrollTimer);enrollTimer=null;
+  stopEnrollStream();
+  await api(API+'/api/enroll/cancel',{method:'POST'});
+  document.getElementById('startEnrollBtn').style.display='inline-flex';
+  document.getElementById('cancelEnrollBtn').style.display='none';
+  document.getElementById('progWrap').style.display='none';
+  document.getElementById('enrollStatus').textContent='CANCELLED';
+  document.getElementById('enrollFeed').style.display='none';
+  document.getElementById('enrollVideo').style.display='block';
+  toast('CANCELLED','warn');
+}
+
+function stopEnrollStream(){
+  clearInterval(enrollTimer);enrollTimer=null;
+  if(enrollStream){enrollStream.getTracks().forEach(t=>t.stop());enrollStream=null;}
+}
+
+async function startRecognize(){
+  try{recStream=await startCam(document.getElementById('recVideo'));}
+  catch(e){
+    let msg='Camera error: '+e.message;
+    if(e.name==='NotAllowedError')  msg='Camera blocked — click camera icon in address bar → Allow.';
+    if(e.name==='NotFoundError')    msg='No camera found.';
+    if(e.name==='NotReadableError') msg='Camera in use by another app.';
+    toast(msg,'err');
+    document.getElementById('recStatus').textContent='CAMERA BLOCKED';
+    return;
+  }
+  recRunning=true;
+  document.getElementById('recVideo').style.display='block';
+  document.getElementById('recFeed').style.display='none';
+  document.getElementById('startRecBtn').style.display='none';
+  document.getElementById('stopRecBtn').style.display='inline-flex';
+  document.getElementById('recStatus').textContent='SCANNING…';
+  recTimer=setInterval(sendRecFrame,500);
+}
+
+async function sendRecFrame(){
+  const video=document.getElementById('recVideo');
+  if(!video.videoWidth||!recRunning)return;
+  const res=await api(API+'/api/recognize/frame',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({frame:grabFrame(video)})});
+  if(res.error)return;
+  if(res.preview){const f=document.getElementById('recFeed');f.src=res.preview;f.style.display='block';}
+  const badge=document.getElementById('recBadge'),details=document.getElementById('recDetails'),confSec=document.getElementById('confSection');
+  if(res.status==='no_face'||!res.results||!res.results.length){
+    badge.className='result-badge r-noface';badge.textContent='── NO FACE DETECTED ──';
+    confSec.style.display='none';details.innerHTML='';
+    document.getElementById('recStatus').textContent='NO FACE — ADJUST POSITION';
+    return;
+  }
+  document.getElementById('recStatus').textContent=res.results.length+' FACE(S) DETECTED';
+  const best=res.results[0],conf=best.confidence??0;
+  confSec.style.display='block';
+  document.getElementById('confVal').textContent=conf.toFixed(2);
+  document.getElementById('confFill').style.width=Math.min(100,conf/150*100)+'%';
+  if(best.result==='MATCH'&&best.person){
+    badge.className='result-badge r-match';badge.textContent='✓  MATCH FOUND';
+    details.innerHTML=`<div class="irow"><span class="ik">IDENTIFIED</span><span class="iv">${best.person.name}</span></div><div class="irow"><span class="ik">AGE</span><span class="iv">${best.person.age}</span></div><div class="irow"><span class="ik">SEX</span><span class="iv">${best.person.sex}</span></div><div class="irow"><span class="ik">DOB</span><span class="iv">${best.person.dob}</span></div><div class="irow"><span class="ik">SCORE</span><span class="iv">${conf.toFixed(2)}</span></div>`;
+    addScan(best.person.name,conf,true);
+  }else{
+    badge.className='result-badge r-nomatch';badge.textContent='✗  NOT RECOGNISED';
+    details.innerHTML=`<div class="irow"><span class="ik">STATUS</span><span class="iv">UNKNOWN PERSON</span></div><div class="irow"><span class="ik">SCORE</span><span class="iv">${conf.toFixed(2)}</span></div><div class="irow"><span class="ik">THRESHOLD</span><span class="iv">&lt; 75 REQUIRED</span></div>`;
+    addScan('UNKNOWN',conf,false);
+  }
+}
+
+function addScan(name,conf,match){
+  const box=document.getElementById('recentScans');
+  const div=document.createElement('div');
+  div.className='scan-row'+(match?'':' no');
+  div.innerHTML=`<span>${name}</span><span style="color:#555">${conf.toFixed(1)}</span>`;
+  box.insertBefore(div,box.firstChild);
+  while(box.children.length>6)box.removeChild(box.lastChild);
+}
+
+function stopRecognize(){
+  recRunning=false;clearInterval(recTimer);recTimer=null;
+  if(recStream){recStream.getTracks().forEach(t=>t.stop());recStream=null;}
+  document.getElementById('startRecBtn').style.display='inline-flex';
+  document.getElementById('stopRecBtn').style.display='none';
+  document.getElementById('recStatus').textContent='PRESS START TO BEGIN';
+  document.getElementById('recFeed').style.display='none';
+  document.getElementById('recVideo').style.display='block';
+  document.getElementById('recBadge').className='result-badge r-idle';
+  document.getElementById('recBadge').textContent='── AWAITING SCAN ──';
+  document.getElementById('confSection').style.display='none';
+  document.getElementById('recDetails').innerHTML='';
+}
+
+async function loadLog(){
+  const rows=await api(API+'/api/log');
+  if(!Array.isArray(rows))return;
+  const tb=document.getElementById('logTbody');
+  tb.innerHTML='';
+  rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.className=r.result==='MATCH'?'lm':'ln';
+    tr.innerHTML=`<td>${r.recognized_at}</td><td>${r.name||'— UNKNOWN —'}</td><td>${r.confidence!=null?r.confidence.toFixed(2):'N/A'}</td><td><span class="badge ${r.result==='MATCH'?'bm':'bn'}">${r.result==='MATCH'?'MATCH':'NO MATCH'}</span></td>`;
+    tb.appendChild(tr);
+  });
+  document.getElementById('logCount').textContent=rows.length+' ENTRIES';
+}
+
+loadStats();loadPersons('all');
+</script>
+</body>
+</html>
