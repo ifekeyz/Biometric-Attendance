@@ -19,7 +19,9 @@ BASE_DIR   = Path(__file__).parent
 DB_PATH    = BASE_DIR / "biometric.db"
 MODEL_PATH = BASE_DIR / "face_model.yml"
 HTML_PATH  = BASE_DIR / "index.html"
-PORT       = 8787
+import os
+PORT = int(os.environ.get("PORT", 8787))
+
 MIN_CONF   = 75
 IMG_SIZE   = (150, 150)
 SAMPLES_NEEDED = 5
@@ -650,8 +652,9 @@ if __name__ == "__main__":
     print(f"  Server: {url}")
     print(f"  Press Ctrl+C to stop.")
     print(f"{'='*54}\n")
-    threading.Timer(1.2, lambda: webbrowser.open(url)).start()
-    server = http.server.HTTPServer(("localhost", PORT), Handler)
+    # threading.Timer(1.2, lambda: webbrowser.open(url)).start()
+    # server = http.server.HTTPServer(("localhost", PORT), Handler)
+    server = http.server.HTTPServer(("0.0.0.0", PORT), Handler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
